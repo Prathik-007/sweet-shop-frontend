@@ -1,35 +1,46 @@
-import { describe, it, expect, vi } from 'vitest'; // <-- Import vi
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import RegisterPage from '../pages/RegisterPage';
-import axios from 'axios'; // <-- Import axios
+import { useAuth } from '../context/AuthContext'; // Import the real hook
 
-// Mock the entire axios library
-vi.mock('axios');
+// Mock the AuthContext
+vi.mock('../context/AuthContext', () => ({
+  useAuth: vi.fn(), // Mock the useAuth hook
+}));
+
+const mockRegister = vi.fn(); // Create a spy function
 
 const renderWithRouter = (ui) => {
   return render(ui, { wrapper: MemoryRouter });
 };
 
 describe('RegisterPage Component', () => {
+  // Set up the mock before each test
+  beforeEach(() => {
+    vi.clearAllMocks(); // Clear spy history
+    // Make useAuth return our spy function
+    useAuth.mockReturnValue({
+      register: mockRegister, 
+    });
+  });
+
   it('should render the registration form', () => {
+    renderWithRouter(<RegisterPage />);
     // ... (existing test)
   });
 
   it('should update form state on user input', async () => {
+    const user = userEvent.setup();
+    renderWithRouter(<RegisterPage />);
     // ... (existing test)
   });
 
-  // --- NEW TEST ---
-  it('should call the register API on form submit', async () => {
+  // --- UPDATED TEST ---
+  it('should call register from context on form submit', async () => {
     const user = userEvent.setup();
     renderWithRouter(<RegisterPage />);
-
-    // Mock a successful API response
-    axios.post.mockResolvedValue({
-      data: { token: 'fake_jwt_token' },
-    });
 
     // 1. Fill out the form
     await user.type(screen.getByLabelText(/name/i), 'Test User');
@@ -39,16 +50,11 @@ describe('RegisterPage Component', () => {
     // 2. Click the register button
     await user.click(screen.getByRole('button', { name: /register/i }));
 
-    // 3. Check if axios.post was called correctly
-    expect(axios.post).toHaveBeenCalledWith(
-      // We expect it to call the backend register endpoint
-      '/api/auth/register',
-      // We expect it to send all the form data
-      {
-        name: 'Test User',
-        email: 'test@example.com',
-        password: 'password123',
-      }
+    // 3. Check if our mock register function was called correctly
+    expect(mockRegister).toHaveBeenCalledWith(
+      'Test User',
+      'test@example.com',
+      'password123'
     );
   });
 });
