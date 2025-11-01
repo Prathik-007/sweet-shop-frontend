@@ -1,7 +1,7 @@
-import React, { useState } from 'react'; // <-- Import useState
+import React, { useState } from 'react';
+import axios from 'axios'; // <-- Import axios
 
 function LoginPage() {
-  // --- ADD STATE ---
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -9,7 +9,6 @@ function LoginPage() {
 
   const { email, password } = formData;
 
-  // --- ADD ONCHANGE HANDLER ---
   const onChange = (e) => {
     setFormData({
       ...formData,
@@ -17,17 +16,38 @@ function LoginPage() {
     });
   };
 
+  // --- ADD ONSUBMIT HANDLER ---
+  const onSubmit = async (e) => {
+    e.preventDefault(); // Prevent page reload
+    
+    try {
+      const loginData = { email, password };
+      
+      // This is the call our test is looking for
+      const res = await axios.post('/api/auth/login', loginData);
+
+      console.log('Login successful:', res.data.token);
+      // We'll handle storing the token and redirecting later
+      
+    } catch (err) {
+      console.error('Login failed:', err.response.data);
+      // We'll handle errors later
+    }
+  };
+
   return (
     <div>
       <h2>Login</h2>
-      <form>
+      {/* Add the onSubmit handler to the form */}
+      <form onSubmit={onSubmit}> 
         <div>
           <label htmlFor="email">Email</label>
           <input
             type="email"
             id="email"
-            value={email}       // <-- Set value from state
-            onChange={onChange} // <-- Add onChange handler
+            value={email}
+            onChange={onChange}
+            required // Add required for good practice
           />
         </div>
         <div>
@@ -35,8 +55,9 @@ function LoginPage() {
           <input
             type="password"
             id="password"
-            value={password}    // <-- Set value from state
-            onChange={onChange} // <-- Add onChange handler
+            value={password}
+            onChange={onChange}
+            required // Add required for good practice
           />
         </div>
         <button type="submit">Login</button>
