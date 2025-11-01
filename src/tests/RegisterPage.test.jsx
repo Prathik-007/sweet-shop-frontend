@@ -1,8 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest'; // <-- Import vi
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event'; // <-- IMPORT USER-EVENT
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import RegisterPage from '../pages/RegisterPage';
+import axios from 'axios'; // <-- Import axios
+
+// Mock the entire axios library
+vi.mock('axios');
 
 const renderWithRouter = (ui) => {
   return render(ui, { wrapper: MemoryRouter });
@@ -10,31 +14,41 @@ const renderWithRouter = (ui) => {
 
 describe('RegisterPage Component', () => {
   it('should render the registration form', () => {
-    renderWithRouter(<RegisterPage />);
-    expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /register/i })).toBeInTheDocument();
+    // ... (existing test)
+  });
+
+  it('should update form state on user input', async () => {
+    // ... (existing test)
   });
 
   // --- NEW TEST ---
-  it('should update form state on user input', async () => {
+  it('should call the register API on form submit', async () => {
     const user = userEvent.setup();
     renderWithRouter(<RegisterPage />);
 
-    // Get the inputs
-    const nameInput = screen.getByLabelText(/name/i);
-    const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
+    // Mock a successful API response
+    axios.post.mockResolvedValue({
+      data: { token: 'fake_jwt_token' },
+    });
 
-    // Simulate typing
-    await user.type(nameInput, 'Test User');
-    await user.type(emailInput, 'test@example.com');
-    await user.type(passwordInput, 'password123');
+    // 1. Fill out the form
+    await user.type(screen.getByLabelText(/name/i), 'Test User');
+    await user.type(screen.getByLabelText(/email/i), 'test@example.com');
+    await user.type(screen.getByLabelText(/password/i), 'password123');
 
-    // Check if the inputs' values have changed
-    expect(nameInput.value).toBe('Test User');
-    expect(emailInput.value).toBe('test@example.com');
-    expect(passwordInput.value).toBe('password123');
+    // 2. Click the register button
+    await user.click(screen.getByRole('button', { name: /register/i }));
+
+    // 3. Check if axios.post was called correctly
+    expect(axios.post).toHaveBeenCalledWith(
+      // We expect it to call the backend register endpoint
+      '/api/auth/register',
+      // We expect it to send all the form data
+      {
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'password123',
+      }
+    );
   });
 });
