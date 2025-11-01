@@ -1,15 +1,14 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* We'll set the login page as the home page for now */}
         <Route path="/" element={<LoginPage />} />
-        {/* We'll add other routes here later, like:
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/register" element={<RegisterPage />} /> {/* <-- ADD THIS LINE */}
+        {/* <Route path="/dashboard" element={<DashboardPage />} />
         */}
       </Routes>
     </BrowserRouter>
