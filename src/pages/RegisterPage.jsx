@@ -1,7 +1,7 @@
-import React, { useState } from 'react'; // <-- Import useState
+import React, { useState } from 'react';
+import axios from 'axios'; // <-- Import axios
 
 function RegisterPage() {
-  // --- ADD STATE ---
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -10,7 +10,6 @@ function RegisterPage() {
 
   const { name, email, password } = formData;
 
-  // --- ADD ONCHANGE HANDLER ---
   const onChange = (e) => {
     setFormData({
       ...formData,
@@ -18,17 +17,38 @@ function RegisterPage() {
     });
   };
 
+  // --- ADD ONSUBMIT HANDLER ---
+  const onSubmit = async (e) => {
+    e.preventDefault(); // Prevent page reload
+    
+    try {
+      const registerData = { name, email, password };
+      
+      // This is the call our test is looking for
+      const res = await axios.post('/api/auth/register', registerData);
+
+      console.log('Registration successful:', res.data.token);
+      // We'll handle storing the token and redirecting later
+      
+    } catch (err) {
+      console.error('Registration failed:', err.response.data);
+      // We'll handle errors later
+    }
+  };
+
   return (
     <div>
       <h2>Register</h2>
-      <form>
+      {/* Add the onSubmit handler to the form */}
+      <form onSubmit={onSubmit}>
         <div>
           <label htmlFor="name">Name</label>
           <input
             type="text"
             id="name"
-            value={name}        // <-- Set value from state
-            onChange={onChange} // <-- Add onChange handler
+            value={name}
+            onChange={onChange}
+            required // Add required for good practice
           />
         </div>
         <div>
@@ -36,8 +56,9 @@ function RegisterPage() {
           <input
             type="email"
             id="email"
-            value={email}       // <-- Set value from state
-            onChange={onChange} // <-- Add onChange handler
+            value={email}
+            onChange={onChange}
+            required // Add required for good practice
           />
         </div>
         <div>
@@ -45,8 +66,9 @@ function RegisterPage() {
           <input
             type="password"
             id="password"
-            value={password}    // <-- Set value from state
-            onChange={onChange} // <-- Add onChange handler
+            value={password}
+            onChange={onChange}
+            required // Add required for good practice
           />
         </div>
         <button type="submit">Register</button>
