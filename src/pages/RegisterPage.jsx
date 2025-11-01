@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import axios from 'axios'; // <-- Import axios
+import { useAuth } from '../context/AuthContext'; // <-- Import the useAuth hook
 
 function RegisterPage() {
+  const { register } = useAuth(); // <-- Get the register function from context
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,29 +19,19 @@ function RegisterPage() {
     });
   };
 
-  // --- ADD ONSUBMIT HANDLER ---
+  // --- UPDATED ONSUBMIT HANDLER ---
   const onSubmit = async (e) => {
     e.preventDefault(); // Prevent page reload
     
-    try {
-      const registerData = { name, email, password };
-      
-      // This is the call our test is looking for
-      const res = await axios.post('/api/auth/register', registerData);
-
-      console.log('Registration successful:', res.data.token);
-      // We'll handle storing the token and redirecting later
-      
-    } catch (err) {
-      console.error('Registration failed:', err.response.data);
-      // We'll handle errors later
-    }
+    // Call the register function from the context
+    await register(name, email, password);
+    
+    // The context now handles the API call, token decoding, and state update
   };
 
   return (
     <div>
       <h2>Register</h2>
-      {/* Add the onSubmit handler to the form */}
       <form onSubmit={onSubmit}>
         <div>
           <label htmlFor="name">Name</label>
@@ -48,7 +40,7 @@ function RegisterPage() {
             id="name"
             value={name}
             onChange={onChange}
-            required // Add required for good practice
+            required
           />
         </div>
         <div>
@@ -58,7 +50,7 @@ function RegisterPage() {
             id="email"
             value={email}
             onChange={onChange}
-            required // Add required for good practice
+            required
           />
         </div>
         <div>
@@ -68,7 +60,7 @@ function RegisterPage() {
             id="password"
             value={password}
             onChange={onChange}
-            required // Add required for good practice
+            required
           />
         </div>
         <button type="submit">Register</button>
