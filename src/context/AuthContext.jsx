@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode'; // Import the decoder
 
 // 1. Create the Context
 const AuthContext = createContext();
@@ -15,24 +16,38 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // This is the login function our test calls
-  const login = (newToken, newUser) => {
-    setToken(newToken);
-    setUser(newUser);
-    setIsAuthenticated(true);
-    // In a real app, you'd also set the axios auth header here
-    // axios.defaults.headers.common['x-auth-token'] = newToken;
-    // And save the token to localStorage
-    // localStorage.setItem('token', newToken);
+  // This is the new login function our test is looking for
+  const login = async (email, password) => {
+    try {
+      // 1. Call the API
+      const res = await axios.post('/api/auth/login', { email, password });
+      const newToken = res.data.token;
+
+      // 2. Decode the token to get the user
+      const decodedToken = jwtDecode(newToken);
+      const newUser = decodedToken.user; // Assumes token payload is { user: { id, role } }
+
+      // 3. Set state
+      setToken(newToken);
+      setUser(newUser);
+      setIsAuthenticated(true);
+
+      // 4. Set token in axios headers for future requests
+      axios.defaults.headers.common['x-auth-token'] = newToken;
+      
+      // We'll add localStorage later
+
+    } catch (err) {
+      console.error('Login failed', err);
+      // We'll handle errors properly later
+    }
   };
 
-  // We'll add logout for completeness
   const logout = () => {
     setToken(null);
     setUser(null);
     setIsAuthenticated(false);
-    // delete axios.defaults.headers.common['x-auth-token'];
-    // localStorage.removeItem('token');
+    delete axios.defaults.headers.common['x-auth-token'];
   };
 
   const value = {
