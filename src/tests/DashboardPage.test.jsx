@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import DashboardPage from '../pages/DashboardPage'; // This file doesn't exist yet!
+import DashboardPage from '../pages/DashboardPage';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { act } from 'react'; 
 
 // Mock axios
 vi.mock('axios');
@@ -24,32 +25,48 @@ const renderWithRouter = (ui) => {
 };
 
 describe('DashboardPage Component', () => {
+  // Use a variable to hold the spy, to be defined in beforeEach
+  let axiosGetSpy;
+  
   beforeEach(() => {
     vi.clearAllMocks();
-
+    
     // Mock a logged-in user
     useAuth.mockReturnValue({
       isAuthenticated: true,
       user: { role: 'User' },
+      logout: vi.fn(),
     });
-
-    // Mock the API call
-    axios.get.mockResolvedValue({ data: mockSweets });
+    
+    // Create the spy on axios.get and mock the successful resolution
+    axiosGetSpy = vi.spyOn(axios, 'get').mockResolvedValue({ data: mockSweets });
+  });
+  
+  // Cleanup after the test
+  afterEach(() => {
+    axiosGetSpy.mockRestore(); 
   });
 
   it('should fetch and display sweets on render', async () => {
-    renderWithRouter(<DashboardPage />);
+    let container;
 
-    // Check if the API was called
-    expect(axios.get).toHaveBeenCalledWith('/api/sweets');
-
-    // Wait for the component to update after the API call
-    // We look for the *name* of the last sweet in our mock list
+    // 1. Initial render (useEffect runs here, starting the axios call)
+    await act(async () => {
+        container = renderWithRouter(<DashboardPage />).container;
+    });
+    
+    // 2. ASSERTION: Check if the API was called immediately after mount
+    // The spy should have been called now, even if the promise hasn't resolved
+    expect(axiosGetSpy).toHaveBeenCalledWith('/api/sweets');
+    
+    // 3. ASSERTION: Wait for the promise to resolve and component to re-render
+    // We wait for the 'Jalebi' element to appear, confirming success
     await waitFor(() => {
+      // Use regex to find the text flexibly
       expect(screen.getByText(/Jalebi/i)).toBeInTheDocument();
     });
 
-    // Check if both sweets are rendered
+    // 4. Final check
     expect(screen.getByText(/Kaju Katli/i)).toBeInTheDocument();
   });
 });

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext'; 
+import { useAuth } from '../context/AuthContext';
 
 function DashboardPage() {
     const { user, logout } = useAuth();
@@ -8,13 +8,21 @@ function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // --- JAVASCRIPT LOGIC BLOCK ---
+    const fetchSweets = async () => {
+        try {
+            const res = await axios.get('/api/sweets');
+            setSweets(res.data);
+            setLoading(false);
+            setError(null); // Clear any previous error
+        } catch (err) {
+            console.error('Failed to fetch sweets', err);
+            setError('Failed to load sweets. Check if the backend is running and authenticated.');
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchSweets = async () => {
-            // ... (rest of useEffect code)
-        };
-        fetchSweets();
+        fetchSweets(); // This is correctly placed to run once on mount
     }, []);
 
     const handlePurchase = async (sweetId, currentQuantity) => {
@@ -23,7 +31,7 @@ function DashboardPage() {
         try {
             await axios.post(`/api/sweets/${sweetId}/purchase`);
 
-            // Update the local state
+            // Optimistic UI Update
             setSweets((prevSweets) =>
                 prevSweets.map((sweet) =>
                     sweet._id === sweetId ? { ...sweet, quantity: sweet.quantity - 1 } : sweet
@@ -31,24 +39,43 @@ function DashboardPage() {
             );
         } catch (err) {
             console.error('Purchase failed:', err);
-            alert('Purchase failed. Please try again.'); 
+            alert('Purchase failed. Check stock or network.'); 
+            // Re-fetch in case of failure to sync client state
+            fetchSweets();
         }
     };
     
-    // --- END JAVASCRIPT LOGIC BLOCK ---
-
+    // --- RENDER LOGIC ---
 
     if (loading) {
-        // ... (loading return)
+        return (
+            <div style={{ padding: '20px' }}>
+                <h2>Sweets Dashboard</h2>
+                <p>Loading sweets...</p>
+            </div>
+        );
     }
+    
     if (error) {
-        // ... (error return)
+        return (
+            <div style={{ padding: '20px', color: 'red' }}>
+                <h2>Sweets Dashboard</h2>
+                <p>{error}</p>
+                <button onClick={logout}>Logout</button>
+            </div>
+        );
     }
 
-    // --- MAIN JSX RETURN BLOCK ---
     return (
         <div style={{ padding: '20px' }}>
-            {/* ... (rest of the component) */}
+            {/* --- HEADER --- */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h2>Welcome, {user?.role || 'User'}!</h2>
+                <button onClick={logout}>Logout</button>
+            </div>
+
+            {/* --- SWEET LIST --- */}
+            <h3 style={{ borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>Available Sweets ({sweets.length})</h3>
             
             {sweets.length === 0 ? (
                 <p>No sweets currently available.</p>
@@ -62,7 +89,6 @@ function DashboardPage() {
                             
                             <button 
                                 disabled={sweet.quantity === 0} 
-                                // CORRECT: Call the function we defined above
                                 onClick={() => handlePurchase(sweet._id, sweet.quantity)} 
                             >
                                 {sweet.quantity > 0 ? 'Purchase' : 'Out of Stock'}
@@ -72,7 +98,11 @@ function DashboardPage() {
                 </div>
             )}
             
-            {/* ... (rest of the component) */}
+            {user?.role === 'Admin' && (
+                <p style={{ marginTop: '30px', borderTop: '1px solid #ccc', paddingTop: '10px' }}>
+                    <a href="/admin">Go to Admin Panel</a>
+                </p>
+            )}
         </div>
     );
 }
