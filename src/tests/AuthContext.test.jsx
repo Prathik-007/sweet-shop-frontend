@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { act } from 'react';
 import axios from 'axios';
@@ -44,11 +45,12 @@ describe('AuthContext', () => {
     jwtDecode.mockReturnValue({ user: fakeUser });
 
     render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
+      <MemoryRouter> 
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      </MemoryRouter>
     );
-
     // 3. Click the login button
     await act(async () => {
       await user.click(screen.getByRole('button', { name: /login/i }));
