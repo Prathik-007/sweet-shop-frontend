@@ -1,68 +1,203 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  --color-primary: #ff69b4;
+  --color-secondary: #00bfff;
+  --color-accent: #ffd700;
+  --color-background: #f4f6f9;
+  --color-card-bg: #ffffff;
+  --color-text: #333333;
+  --color-border: #e0e0e0;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--color-text);
+  background-color: var(--color-background);
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* ----------- GLOBAL LAYOUT ----------- */
+#root > div {
+  display: flex;
+  justify-content: center;
+  align-items: center; /* ✅ centers login/register forms */
+  min-height: 100vh;
+  width: 100%;
 }
 
-button {
+.page-container {
+  padding: 40px 30px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ----------- FORM STYLING ----------- */
+form {
+  background: var(--color-card-bg);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 380px;
+  max-width: 90%;
+  text-align: left;
+}
+
+h2 {
+  color: var(--color-primary);
+  margin-bottom: 30px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  font-size: 0.9em;
+  color: var(--color-text);
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: #fcfcfc;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+input:focus {
+  border-color: var(--color-secondary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.2);
+}
+
+/* ----------- BUTTON STYLING ----------- */
+button {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 1em;
+  font-weight: 700;
+  transition: background-color 0.3s, transform 0.1s;
+  text-transform: uppercase;
+  box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
+}
+
+button:hover:not([disabled]) {
+  background-color: #e65a9e;
+  transform: translateY(-2px);
+}
+
+button[disabled] {
+  background-color: #cccccc;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.action-button {
+  width: auto;
+  padding: 8px 15px;
+  font-size: 0.9em;
+}
+
+/* ==================================================
+   ✅ DASHBOARD-SPECIFIC STYLES
+   (won’t affect Login/Register)
+================================================== */
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+  padding-bottom: 20px;
+  margin-bottom: 40px;
+  border-bottom: 3px solid var(--color-border);
+}
+
+.welcome-text {
+  margin: 0;
+  font-size: 2em;
+  color: var(--color-primary);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-actions a {
+  font-weight: 600;
+  color: var(--color-secondary);
+  text-decoration: none;
+}
+
+.header-actions a:hover {
+  text-decoration: underline;
+}
+
+/* SWEET SECTION */
+.sweet-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.sweet-heading {
+  margin-bottom: 20px;
+  color: var(--color-secondary);
+  text-align: center;
+}
+
+.sweet-grid.centered {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 300px));
+  gap: 25px;
+  justify-content: center;
+  align-items: start;
+  width: 100%;
+  max-width: 900px;
+}
+
+.sweet-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.3s, transform 0.3s;
+  text-align: center;
+}
+
+.sweet-card:hover {
+  box-shadow: 0 8px 25px rgba(255, 105, 180, 0.2);
+  transform: translateY(-3px);
+}
+
+.sweet-card h4 {
+  color: var(--color-secondary);
+  font-size: 1.4em;
+  margin-top: 0;
+  border-bottom: 1px dashed var(--color-border);
+  padding-bottom: 10px;
 }

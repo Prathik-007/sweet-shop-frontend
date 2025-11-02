@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext'; // <-- Import the useAuth hook
-// We no longer need axios in this file
+import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom'; // <-- Import Link
 
 function LoginPage() {
-  const { login } = useAuth(); // <-- Get the login function from context
-
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -19,21 +18,16 @@ function LoginPage() {
     });
   };
 
-  // --- UPDATED ONSUBMIT HANDLER ---
   const onSubmit = async (e) => {
-    e.preventDefault(); // Prevent page reload
-    
-    // Call the login function from the context
-    await login(email, password); 
-    
-    // The context now handles the API call, token decoding, and state update
+    e.preventDefault();
+    await login(email, password);
   };
 
   return (
     <div>
-      <h2>Login</h2>
-      <form onSubmit={onSubmit}> 
-        <div>
+      <form onSubmit={onSubmit}>
+        <h2>LOGIN</h2> {/* <-- Move H2 INSIDE the form */}
+        <div style={{ marginBottom: '15px' }}>
           <label htmlFor="email">Email</label>
           <input
             type="email"
@@ -43,7 +37,7 @@ function LoginPage() {
             required
           />
         </div>
-        <div>
+        <div style={{ marginBottom: '25px' }}>
           <label htmlFor="password">Password</label>
           <input
             type="password"
@@ -53,7 +47,12 @@ function LoginPage() {
             required
           />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit">LOGIN</button>
+        
+        {/* --- ADD REGISTRATION LINK --- */}
+        <p style={{ marginTop: '20px' }}>
+            New user? <Link to="/register">Register Here</Link>
+        </p>
       </form>
     </div>
   );
