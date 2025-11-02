@@ -48,77 +48,17 @@ Reflection on Workflow: The AI significantly accelerated development, ensuring t
 
 The core components were developed using a TDD approach.
 
-File
+File                              % Stmts   % Branch    % Funcs   %Lines   Uncovered Line #s
 
-% Stmts
+All Functional Logic                93.8%    85.0%        100%    94.2%      ---
 
-% Branch
+src/context/AuthContext.jsx         95.8%    80.0%        100%    96.5%     48, 70
 
-% Funcs
+src/pages/LoginPage.jsx             100%     100%         100%     100%     ---
 
-% Lines
+src/pages/RegisterPage.jsx          100%     100%         100%     100%     ---
 
-Uncovered Line #s
-
-All Functional Logic
-
-93.8%
-
-85.0%
-
-100%
-
-94.2%
-
----
-
-src/context/AuthContext.jsx
-
-95.8%
-
-80.0%
-
-100%
-
-96.5%
-
-48, 70
-
-src/pages/LoginPage.jsx
-
-100%
-
-100%
-
-100%
-
-100%
-
----
-
-src/pages/RegisterPage.jsx
-
-100%
-
-100%
-
-100%
-
-100%
-
----
-
-src/components/ProtectedRoute.jsx
-
-100%
-
-100%
-
-100%
-
-100%
-
----
+src/components/ProtectedRoute.jsx   100%     100%         100%     100%     ---
 
 ## Note on Final Test Failure
 
