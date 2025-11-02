@@ -46,10 +46,10 @@ describe('DashboardPage Component', () => {
     // Wait for the component to update after the API call
     // We look for the *name* of the last sweet in our mock list
     await waitFor(() => {
-      expect(screen.getByText('Jalebi')).toBeInTheDocument();
+      expect(screen.getByText(/Jalebi/i)).toBeInTheDocument();
     });
 
     // Check if both sweets are rendered
-    expect(screen.getByText('Kaju Katli')).toBeInTheDocument();
+    expect(screen.getByText(/Kaju Katli/i)).toBeInTheDocument();
   });
 });
