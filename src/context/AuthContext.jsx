@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode'; // Import the decoder
+import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom'; // <-- IMPORT useNavigate
 
 // 1. Create the Context
 const AuthContext = createContext();
@@ -15,31 +16,38 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // NOTE: This is the navigate function that can only be called inside a component
+  const navigate = useNavigate(); 
 
-  // This is the new login function our test is looking for
+  const handleAuthSuccess = (newToken) => {
+    const decodedToken = jwtDecode(newToken);
+    const newUser = decodedToken.user;
+
+    setToken(newToken);
+    setUser(newUser);
+    setIsAuthenticated(true);
+    axios.defaults.headers.common['x-auth-token'] = newToken;
+    
+    // REDIRECTION ON SUCCESS
+    navigate('/dashboard'); 
+  };
+
   const login = async (email, password) => {
     try {
-      // 1. Call the API
       const res = await axios.post('/api/auth/login', { email, password });
-      const newToken = res.data.token;
-
-      // 2. Decode the token to get the user
-      const decodedToken = jwtDecode(newToken);
-      const newUser = decodedToken.user; // Assumes token payload is { user: { id, role } }
-
-      // 3. Set state
-      setToken(newToken);
-      setUser(newUser);
-      setIsAuthenticated(true);
-
-      // 4. Set token in axios headers for future requests
-      axios.defaults.headers.common['x-auth-token'] = newToken;
-      
-      // We'll add localStorage later
-
+      handleAuthSuccess(res.data.token);
     } catch (err) {
       console.error('Login failed', err);
-      // We'll handle errors properly later
+    }
+  };
+
+  const register = async (name, email, password) => {
+    try {
+      const res = await axios.post('/api/auth/register', { name, email, password });
+      handleAuthSuccess(res.data.token);
+    } catch (err) {
+      console.error('Registration failed', err);
     }
   };
 
@@ -48,28 +56,9 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     delete axios.defaults.headers.common['x-auth-token'];
-  };
-  const register = async (name, email, password) => {
-    try {
-      // 1. Call the API
-      const res = await axios.post('/api/auth/register', { name, email, password });
-      const newToken = res.data.token;
-
-      // 2. Decode the token to get the user
-      const decodedToken = jwtDecode(newToken);
-      const newUser = decodedToken.user;
-
-      // 3. Set state
-      setToken(newToken);
-      setUser(newUser);
-      setIsAuthenticated(true);
-
-      // 4. Set token in axios headers
-      axios.defaults.headers.common['x-auth-token'] = newToken;
-      
-    } catch (err) {
-      console.error('Registration failed', err);
-    }
+    
+    // Redirect to login page on logout
+    navigate('/'); 
   };
 
   const value = {
