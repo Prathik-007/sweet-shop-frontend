@@ -4,11 +4,10 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminPage from './pages/AdminPage';
 
 function App() {
-  return (
-    // BrowserRouter must be the parent of AuthProvider because 
-    // AuthProvider now uses the useNavigate hook inside it.
+ return (
     <BrowserRouter> 
       <AuthProvider>
         <Routes>
@@ -16,12 +15,20 @@ function App() {
           <Route path="/" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           
-          {/* Protected Route */}
+          {/* Protected Routes */}
           <Route 
             path="/dashboard" 
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route // <-- ADD THIS NEW ROUTE
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <AdminPage />
               </ProtectedRoute>
             } 
           />
