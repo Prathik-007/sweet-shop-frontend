@@ -11,21 +11,23 @@ vi.mock('../context/AuthContext', () => ({
 
 // Dummy components to render
 const DummyDashboard = () => <div>Dashboard Page</div>;
-const DummyLogin = () => <div>Login Page</div>;
+// We'll rename this to DummyRoot/Login
+const DummyLogin = () => <div>Login Page</div>; 
 
 // Helper function to render our test setup
 const renderWithRouter = (isAuthenticated) => {
-  // Mock the auth state
   useAuth.mockReturnValue({
     isAuthenticated: isAuthenticated,
   });
 
-  // Render the app with routes. We'll start on the /dashboard route
-  // to test our ProtectedRoute.
   render(
-    <MemoryRouter initialEntries={['/dashboard']}>
+    // We render the component on the /dashboard route to test the protection
+    <MemoryRouter initialEntries={['/dashboard']}> 
       <Routes>
-        <Route path="/login" element={<DummyLogin />} />
+        {/* FIX: Map the root path (/) to the login page, just like in App.jsx */}
+        <Route path="/" element={<DummyLogin />} /> 
+        
+        {/* The protected route we are testing */}
         <Route 
           path="/dashboard" 
           element={
@@ -40,18 +42,18 @@ const renderWithRouter = (isAuthenticated) => {
 };
 
 describe('ProtectedRoute Component', () => {
+  // ... (Test 1: should render the child component if user is authenticated)
   it('should render the child component if user is authenticated', () => {
     renderWithRouter(true); // true = authenticated
-
-    // We should see the dashboard
     expect(screen.getByText('Dashboard Page')).toBeInTheDocument();
     expect(screen.queryByText('Login Page')).not.toBeInTheDocument();
   });
 
+  // ... (Test 2: should redirect to login page if user is not authenticated)
   it('should redirect to login page if user is not authenticated', () => {
     renderWithRouter(false); // false = not authenticated
-
-    // We should be redirected to the login page
+    
+    // NOW it finds the route for the redirect (which is '/')
     expect(screen.getByText('Login Page')).toBeInTheDocument();
     expect(screen.queryByText('Dashboard Page')).not.toBeInTheDocument();
   });
